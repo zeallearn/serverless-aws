@@ -1,0 +1,34 @@
+service: mysqlBackuptoS3
+
+plugins:
+  - serverless-bundle
+  - serverless-pseudo-parameters
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  region: ap-south-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    MysqlBackup_Bucket_NAME: ${self:custom.MysqlBackupBucket.name}
+  iamRoleStatements:
+    - ${file(iam/MysqlBackupBucketIAM.yml):MysqlBackupBucketIAM}
+
+resources:
+  Resources:
+    MysqlBackupBucket: ${file(resources/MysqlBackupBucket.yml):MysqlBackupBucket}
+    MysqlBackupBucketPolicy: ${file(resources/MysqlBackupBucket.yml):MysqlBackupBucketPolicy}
+  
+functions:
+  uploadMysqlBackupS3:
+    handler: src/handlers/uploadMysqlBackupS3.handler
+    events:
+      - schedule:
+          rate: rate(1 minute)
+
+custom:
+  MysqlBackupBucket:
+    name: mysqlbackup-bucket-sj19asxm-${self:provider.stage}
+  bundle:
+    linting: false
