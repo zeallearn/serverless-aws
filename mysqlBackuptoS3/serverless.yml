@@ -12,8 +12,10 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     MysqlBackup_Bucket_NAME: ${self:custom.MysqlBackupBucket.name}
+    MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
   iamRoleStatements:
     - ${file(iam/MysqlBackupBucketIAM.yml):MysqlBackupBucketIAM}
+    - ${file(iam/MailQueueIAM.yml):MailQueueIAM}
 
 resources:
   Resources:
@@ -25,10 +27,13 @@ functions:
     handler: src/handlers/uploadMysqlBackupS3.handler
     events:
       - schedule:
-          rate: rate(1 minute)
+          rate: rate(1 day)
 
 custom:
   MysqlBackupBucket:
     name: mysqlbackup-bucket-sj19asxm-${self:provider.stage}
+  MailQueue:
+    arn: ${cf:notification-service-${self:provider.stage}.MailQueueArn}
+    url: ${cf:notification-service-${self:provider.stage}.MailQueueUrl}
   bundle:
     linting: false
