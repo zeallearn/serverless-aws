@@ -33,7 +33,16 @@ export async function uploadMysqlBackupS3(event, context) {
   console.log(uploadToS3Result);
   return;
 }else{
- console.log('error');
+  await sqs.sendMessage({
+    QueueUrl: process.env.MAIL_QUEUE_URL,
+    MessageBody: JSON.stringify({
+      subject: 'Dump failed',
+      recipient: 'jyotikhera88@gmail.com',
+      body: 'Backup failed!!',
+    })
+  }
+  ).promise();
+  return;
 }
 //return Promise.all([notify]);
 }
