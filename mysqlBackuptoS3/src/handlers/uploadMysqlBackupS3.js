@@ -8,7 +8,7 @@ export async function uploadMysqlBackupS3(event, context) {
   const filename = `dump.sql`;
   const backup = "/tmp/" + filename;
   if(mysqldump){
-   mysqldump({
+   await mysqldump({
         connection: {
             host: 'mydatabase.ckjpjx6yqq1r.ap-south-1.rds.amazonaws.com',
             user: 'admin',
@@ -18,7 +18,6 @@ export async function uploadMysqlBackupS3(event, context) {
         dumpToFile: backup
     });
   //const buffer = Buffer.from(backup, 'utf8');
-  fs.readFileSync(backup)
   const uploadToS3Result = await uploadS3(filename, backup);
   await sqs.sendMessage({
     QueueUrl: process.env.MAIL_QUEUE_URL,

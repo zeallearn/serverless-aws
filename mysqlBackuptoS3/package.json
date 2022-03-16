@@ -18,6 +18,8 @@
   "dependencies": {
     "aws-sdk": "^2.1092.0",
     "mysqldump": "^3.2.0",
-    "serverless-mysql": "^1.5.4"
+    "mysqldumpjs": "^1.0.0",
+    "serverless-mysql": "^1.5.4",
+    "yarn": "^1.22.17"
   }
 }
